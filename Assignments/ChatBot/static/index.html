@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychology Chatbot</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+        .chat-box .message {
+            margin: 10px 0;
+        }
+        .chat-box .user {
+            text-align: right;
+            color: blue;
+        }
+        .chat-box .bot {
+            text-align: left;
+            color: green;
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-group .form-control {
+            border-radius: 0;
+        }
+        .input-group .btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            border-radius: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container chat-container">
+    <h2 class="text-center">Agile Chatbot</h2>
+    <div id="chat-box" class="chat-box">
+        <!-- Chat messages will be appended here -->
+    </div>
+    <div class="input-group">
+        <input type="text" id="user-input" class="form-control" placeholder="Type your message here...">
+        <button id="send-btn" class="btn btn-primary">Send</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    document.getElementById('user-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+        const userInput = document.getElementById('user-input').value;
+        if (!userInput) return;
+
+        const chatBox = document.getElementById('chat-box');
+        appendMessage('You', userInput, 'user');
+
+        fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+            appendMessage('Bot', data.response, 'bot');
+        });
+
+        document.getElementById('user-input').value = '';
+    }
+
+    function appendMessage(sender, message, className) {
+        const chatBox = document.getElementById('chat-box');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${className}`;
+        messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
